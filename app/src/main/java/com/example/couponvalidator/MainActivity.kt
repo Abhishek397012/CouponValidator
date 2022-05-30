@@ -21,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     var db = FirebaseDatabase.getInstance().reference
     lateinit var dialog: Dialog
 
+    val boothName = "temp"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
@@ -56,10 +58,22 @@ class MainActivity : AppCompatActivity() {
                                     val no = dialog.findViewById<Button>(R.id.no)
 
                                     yes.setOnClickListener {
+                                        // Record
                                         db.child("referal/$number/Used")
                                             .setValue("Yes")
                                         db.child("referal/$number/time")
                                             .setValue(Date().toString())
+                                        db.child("referral/$number/redeemedBy")
+                                            .setValue(boothName)
+
+                                        // Booth count increment
+                                        db.child("boothCount/$boothName").get()
+                                            .addOnSuccessListener {
+                                                var ct: Int = it.value as Int
+                                                ct++
+                                                db.child("boothCount/$boothName").setValue(ct)
+                                            }
+
                                         dialog.dismiss()
                                         Toast.makeText(
                                             baseContext,
@@ -74,9 +88,11 @@ class MainActivity : AppCompatActivity() {
                                     }
                                     dialog.show()
                                 } else {
-                                    var message = "Coupon is already used on "
+
                                     val time = data.child("time").value.toString()
-                                    message += time
+                                    val redeemedBy = data.child("redeemedBy").value.toString()
+                                    val message =
+                                        "Coupon is already redeemed on $time by $redeemedBy"
 
                                     dialog.setContentView(R.layout.alreadyused)
                                     val close = dialog.findViewById<ImageView>(R.id.close)
