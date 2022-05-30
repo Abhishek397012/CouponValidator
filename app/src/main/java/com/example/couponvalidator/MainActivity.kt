@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     var db = FirebaseDatabase.getInstance().reference
     lateinit var dialog: Dialog
 
-    val boothName = "CNX-14-6"
+    val boothName = "CNX-14-17"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
