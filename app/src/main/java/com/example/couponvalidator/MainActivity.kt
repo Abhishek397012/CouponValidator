@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         dialog = Dialog(this)
 
         binding.verify.setOnClickListener {
@@ -66,15 +66,15 @@ class MainActivity : AppCompatActivity() {
                                             .setValue(Date().toString())
                                         db.child("referral/$number/redeemedBy")
                                             .setValue(boothName)
+
                                         // Booth count increment
                                         db.child("boothCount/$boothName")
                                             .addListenerForSingleValueEvent(
                                                 object : ValueEventListener {
-                                                    override fun onCancelled(p0: DatabaseError) {
-                                                    }
+                                                    override fun onCancelled(p0: DatabaseError) {}
 
                                                     override fun onDataChange(data: DataSnapshot) {
-                                                        var ct: Int = data.value as Int
+                                                        var ct: Long = data.value as Long
                                                         ct++
                                                         db.child("boothCount/$boothName")
                                                             .setValue(ct)
