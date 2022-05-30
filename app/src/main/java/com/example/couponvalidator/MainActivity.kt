@@ -9,29 +9,42 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.couponvalidator.databinding.ActivityMainBinding
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class   MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
-    var db = FirebaseDatabase.getInstance().reference
+    private lateinit var db: DatabaseReference
+
+    val boothName = "admin"
+
     lateinit var dialog: Dialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        db = Firebase.database.reference
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         dialog = Dialog(this)
 
+        binding.seeInfo.setOnClickListener {
+            dialog.setContentView(R.layout.see_booth_info)
+
+
+
+
+            dialog.show()
+        }
+
         binding.verify.setOnClickListener {
+//            setup(1, 100)
             binding.verify.isEnabled = false
-            val number = binding.editTextNumber.text.toString()
+            val number = binding.editTextNumber.text.trim().toString()
 
-            if (binding.editTextNumber.text.isEmpty()) {
-
+            if (number.isEmpty()) {
                 dialog.setContentView(R.layout.invalid)
                 val close = dialog.findViewById<ImageView>(R.id.close2)
                 close.setOnClickListener {
@@ -42,10 +55,18 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            db.child("referal").child(binding.editTextNumber.text.toString())
+
+            db.child("referral").child(binding.editTextNumber.text.toString())
                 .addListenerForSingleValueEvent(
                     object : ValueEventListener {
+
                         override fun onCancelled(p0: DatabaseError) {
+                            Toast.makeText(
+                                baseContext,
+                                "Some Network Error Occurred, Please Tuy again!!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            binding.verify.isEnabled = true
                         }
 
                         override fun onDataChange(data: DataSnapshot) {
@@ -56,10 +77,12 @@ class MainActivity : AppCompatActivity() {
                                     val no = dialog.findViewById<Button>(R.id.no)
 
                                     yes.setOnClickListener {
-                                        db.child("referal/$number/Used")
+                                        db.child("referral/$number/Used")
                                             .setValue("Yes")
-                                        db.child("referal/$number/time")
+                                        db.child("referral/$number/time")
                                             .setValue(Date().toString())
+                                        db.child("referral/$number/redeemedBy")
+                                            .setValue(boothName)
                                         dialog.dismiss()
                                         Toast.makeText(
                                             baseContext,
@@ -74,14 +97,15 @@ class MainActivity : AppCompatActivity() {
                                     }
                                     dialog.show()
                                 } else {
-                                    var message = "Coupon is already used on "
                                     val time = data.child("time").value.toString()
-                                    message += time
+                                    val redeemedBy = data.child("redeemedBy").value.toString()
+                                    val message = "Coupon is already redeemed on $time by $redeemedBy"
+
 
                                     dialog.setContentView(R.layout.alreadyused)
                                     val close = dialog.findViewById<ImageView>(R.id.close)
-                                    val settext = dialog.findViewById<TextView>(R.id.invalidwarning)
-                                    settext.text = message
+                                    val setText = dialog.findViewById<TextView>(R.id.invalidwarning)
+                                    setText.text = message
                                     close.setOnClickListener {
                                         dialog.dismiss()
                                         binding.editTextNumber.text.clear()
@@ -110,7 +134,7 @@ class MainActivity : AppCompatActivity() {
                 )
         }
 
-        db.child("referal").addValueEventListener(
+        db.child("referral").addValueEventListener(
             object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {}
 
@@ -122,15 +146,30 @@ class MainActivity : AppCompatActivity() {
                         if (each.child("Used").value.toString() == "Yes")
                             redeemed++
                     }
+
                     binding.fraction.text = "$redeemed/$ct"
-                    if (ct != 0)
-                        binding.percentage.text =
+
+                    binding.percentage.text =
+                        if (ct != 0)
                             String.format("%.2f", (redeemed.toDouble() / ct.toDouble()) * 100) + "%"
+                        else
+                            "0.00%"
+
                     binding.progressBar.progress =
                         ((redeemed.toDouble() / ct.toDouble()) * 100).toInt()
                 }
             }
         )
 
+    }
+
+
+    private fun setup(start: Int, end: Int) {
+        for(each in start..end) {
+            val map = mapOf(
+                "Used" to "No"
+            )
+            db.child("referral").child(each.toString()).setValue(map)
+        }
     }
 }

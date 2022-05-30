@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+
         <androidx.appcompat.widget.Toolbar
 
             android:id="@+id/toolbar"
@@ -24,7 +25,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="Coupon Validator" />
-
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/appCompatImageView"
@@ -45,16 +45,13 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="40dp"
             android:layout_marginEnd="32dp"
-            android:layout_marginBottom="40dp"
             android:text="Please Enter Coupon Code Below!!"
             android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="30sp"
-            app:layout_constraintBottom_toTopOf="@+id/editTextNumber"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            app:layout_constraintVertical_bias="0.45" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <View
             android:id="@+id/view"
@@ -94,20 +91,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextNumber" />
 
+        <Button
+            android:id="@+id/seeInfo"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="40dp"
+            android:background="@color/colorPrimaryDark"
+            android:text="Booth Status"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/verify"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/verify"
+            app:layout_constraintTop_toBottomOf="@+id/verify" />
+
         <TextView
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
+            android:layout_marginBottom="24dp"
             android:text="Redeemed: "
             android:textColor="@android:color/black"
             android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@+id/view"
             app:layout_constraintEnd_toStartOf="@+id/fraction"
             app:layout_constraintHorizontal_bias="0.34"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/verify"
-            app:layout_constraintVertical_bias="0.87" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/fraction"
