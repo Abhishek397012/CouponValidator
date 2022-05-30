@@ -2,6 +2,7 @@ package com.example.couponvalidator
 
 import android.app.Dialog
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     var db = FirebaseDatabase.getInstance().reference
     lateinit var dialog: Dialog
 
-    val boothName = "temp"
+    val boothName = "CNX-14-6"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            db.child("referal").child(binding.editTextNumber.text.toString())
+            db.child("referral").child(binding.editTextNumber.text.toString())
                 .addListenerForSingleValueEvent(
                     object : ValueEventListener {
                         override fun onCancelled(p0: DatabaseError) {
@@ -59,20 +60,26 @@ class MainActivity : AppCompatActivity() {
 
                                     yes.setOnClickListener {
                                         // Record
-                                        db.child("referal/$number/Used")
+                                        db.child("referral/$number/Used")
                                             .setValue("Yes")
-                                        db.child("referal/$number/time")
+                                        db.child("referral/$number/time")
                                             .setValue(Date().toString())
                                         db.child("referral/$number/redeemedBy")
                                             .setValue(boothName)
-
                                         // Booth count increment
-                                        db.child("boothCount/$boothName").get()
-                                            .addOnSuccessListener {
-                                                var ct: Int = it.value as Int
-                                                ct++
-                                                db.child("boothCount/$boothName").setValue(ct)
-                                            }
+                                        db.child("boothCount/$boothName")
+                                            .addListenerForSingleValueEvent(
+                                                object : ValueEventListener {
+                                                    override fun onCancelled(p0: DatabaseError) {
+                                                    }
+
+                                                    override fun onDataChange(data: DataSnapshot) {
+                                                        var ct: Int = data.value as Int
+                                                        ct++
+                                                        db.child("boothCount/$boothName")
+                                                            .setValue(ct)
+                                                    }
+                                                })
 
                                         dialog.dismiss()
                                         Toast.makeText(
@@ -126,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 )
         }
 
-        db.child("referal").addValueEventListener(
+        db.child("referral").addValueEventListener(
             object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {}
 
